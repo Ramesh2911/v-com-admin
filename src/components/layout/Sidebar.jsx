@@ -2,11 +2,11 @@ import { NavLink } from 'react-router-dom';
 import {
   LayoutDashboard, Users, Building2, ClipboardList, FileText, Wrench, Siren,
   Building, Palette, BellRing, BarChart3, ShieldCheck, UserCog, LifeBuoy,
-  ScrollText, Settings, X, Briefcase, CalendarCheck, Layers,
+  ScrollText, Settings, X, Briefcase, CalendarCheck, Layers, Percent,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { cx } from '../../lib/utils';
-import logo from '../../../assets/logo.jpeg';
+import logoIcon from '../../../assets/logo-icon.png';
 
 const NAV = [
   {
@@ -49,6 +49,7 @@ const NAV = [
       { to: '/hr/attendance', label: 'Attendance', icon: CalendarCheck, perm: 'hr.view' },
       { to: '/hr/leaves', label: 'Leaves', icon: ClipboardList, perm: 'hr.view' },
       { to: '/services', label: 'Services & Content', icon: Palette, perm: 'services.view' },
+      { to: '/offers', label: 'Offers & Coupons', icon: Percent, perm: 'offers.view' },
       { to: '/notifications', label: 'Notifications', icon: BellRing, perm: 'notifications.manage' },
     ],
   },
@@ -115,9 +116,9 @@ export default function Sidebar({ onClose }) {
       <div className="relative px-4 pt-5 pb-4 flex items-center justify-between border-b border-white/8">
         <div className="flex items-center gap-3 min-w-0">
           <img
-            src={logo}
+            src={logoIcon}
             alt="V_COM"
-            className="h-11 w-11 rounded-xl object-cover ring-1 ring-white/15 shadow-lg shadow-emerald-500/10 shrink-0"
+            className="h-11 w-11 rounded-xl bg-white object-contain ring-1 ring-white/15 shadow-lg shadow-emerald-500/10 shrink-0"
           />
           <div className="min-w-0">
             <p className="font-display font-extrabold text-[17px] leading-none tracking-tight">V_COM</p>

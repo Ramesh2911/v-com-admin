@@ -20,6 +20,7 @@ import Projects from './pages/properties/Projects';
 import Areas from './pages/properties/Areas';
 import PropertyEnquiries from './pages/properties/PropertyEnquiries';
 import Services from './pages/services/Services';
+import Offers from './pages/offers/Offers';
 import Employees from './pages/hr/Employees';
 import Attendance from './pages/hr/Attendance';
 import Leaves from './pages/hr/Leaves';
@@ -75,6 +76,7 @@ export default function App() {
           <Route path="properties/enquiries" element={<Guard perm="properties.enquiries"><PropertyEnquiries /></Guard>} />
 
           <Route path="services" element={<Guard perm="services.view"><Services /></Guard>} />
+          <Route path="offers" element={<Guard perm="offers.view"><Offers /></Guard>} />
 
           <Route path="hr" element={<Guard perm="hr.view"><Employees /></Guard>} />
           <Route path="hr/attendance" element={<Guard perm="hr.view"><Attendance /></Guard>} />

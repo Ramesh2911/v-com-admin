@@ -77,6 +77,17 @@ export const servicesApi = {
   deleteCategory: (id) => api.delete(`/admin/services/categories/${id}`),
 };
 
+export const offersApi = {
+  offers: (params) => api.get('/admin/offers', { params }),
+  createOffer: (data) => api.post('/admin/offers', data),
+  updateOffer: (id, data) => api.put(`/admin/offers/${id}`, data),
+  deleteOffer: (id) => api.delete(`/admin/offers/${id}`),
+  coupons: (params) => api.get('/admin/coupons', { params }),
+  createCoupon: (data) => api.post('/admin/coupons', data),
+  updateCoupon: (id, data) => api.put(`/admin/coupons/${id}`, data),
+  deleteCoupon: (id) => api.delete(`/admin/coupons/${id}`),
+};
+
 export const propertiesApi = {
   list: (params) => api.get('/admin/properties', { params }),
   get: (id) => api.get(`/admin/properties/${id}`),

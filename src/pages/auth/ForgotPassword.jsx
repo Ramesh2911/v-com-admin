@@ -8,7 +8,7 @@ import { authApi } from '../../api/endpoints';
 import { getError } from '../../api/client';
 import { useAuth } from '../../context/AuthContext';
 import { Button, Input, useToast } from '../../components/ui';
-import logo from '../../../assets/logo.jpeg';
+import logoIcon from '../../../assets/logo-icon.png';
 
 const STEPS = [
   { icon: Mail, title: 'Enter your email', desc: 'We match it against your account' },
@@ -64,9 +64,9 @@ export default function ForgotPassword() {
         <div className="relative animate-fade-up" style={{ animationDelay: '60ms' }}>
           <div className="flex items-center gap-4">
             <img
-              src={logo}
+              src={logoIcon}
               alt="V_COM logo"
-              className="h-20 w-20 rounded-2xl object-cover ring-1 ring-white/15 shadow-[0_0_60px_-14px_rgba(139,92,246,0.55)] animate-float"
+              className="h-20 w-20 rounded-2xl bg-white object-contain ring-1 ring-white/15 shadow-[0_0_60px_-14px_rgba(139,92,246,0.55)] animate-float"
             />
             <div>
               <p className="font-display text-2xl font-extrabold text-white tracking-tight">V_COM</p>
@@ -133,7 +133,7 @@ export default function ForgotPassword() {
         <div className="relative w-full max-w-[440px]">
           {/* mobile brand */}
           <div className="lg:hidden flex items-center gap-3 mb-8 justify-center animate-fade-up">
-            <img src={logo} alt="V_COM logo" className="h-14 w-14 rounded-xl object-cover ring-1 ring-slate-200 shadow-md" />
+            <img src={logoIcon} alt="V_COM logo" className="h-14 w-14 rounded-xl bg-white object-contain ring-1 ring-slate-200 shadow-md" />
             <span className="font-display text-2xl font-extrabold">V_COM</span>
           </div>
 

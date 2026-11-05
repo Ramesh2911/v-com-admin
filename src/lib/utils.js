@@ -114,7 +114,7 @@ export const labelize = (s) =>
     .replace(/_/g, ' ')
     .replace(/\b\w/g, (c) => c.toUpperCase());
 
-export const FILE_BASE = (import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api').replace(/\/api$/, '');
+export const FILE_BASE = (import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api/v1').replace(/\/api(\/v1)?$/, '');
 export const mediaUrl = (path) => {
   if (!path) return null;
   if (/^https?:/.test(path) || path.startsWith('data:')) return path;

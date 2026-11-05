@@ -2,7 +2,7 @@ import { NavLink } from 'react-router-dom';
 import {
   LayoutDashboard, Users, Building2, ClipboardList, FileText, Wrench, Siren,
   Building, Palette, BellRing, BarChart3, ShieldCheck, UserCog, LifeBuoy,
-  ScrollText, Settings, X, Briefcase, CalendarCheck, Layers, Percent,
+  ScrollText, Settings, X, Briefcase, CalendarCheck, Layers, Percent, Star,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { cx } from '../../lib/utils';
@@ -29,6 +29,7 @@ const NAV = [
       { to: '/requests', label: 'Requests', icon: ClipboardList, perm: 'requests.view' },
       { to: '/quotations', label: 'Quotations', icon: FileText, perm: 'quotations.view' },
       { to: '/jobs', label: 'Jobs & Orders', icon: Wrench, perm: 'jobs.view' },
+      { to: '/reviews', label: 'Service Reviews', icon: Star, perm: 'reviews.view' },
       { to: '/sos', label: 'SOS Emergency', icon: Siren, perm: 'sos.view', accent: true },
     ],
   },

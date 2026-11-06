@@ -2,10 +2,11 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
   ArrowLeft, CheckCircle2, XCircle, PauseCircle, MapPin, Phone, Mail,
-  Briefcase, Star, Wrench, CalendarDays, Building2,
+  Briefcase, Star, Wrench, CalendarDays, Building2, HardHat,
 } from 'lucide-react';
 import { vendorsApi } from '../../api/endpoints';
 import { getError } from '../../api/client';
+import { useAuth } from '../../context/AuthContext';
 import {
   Card, CardHeader, CardBody, Button, StatusBadge, PageLoader, Avatar,
   InfoRow, useToast, ConfirmDialog, Table, TH, TD, TRow, Badge, EmptyState,
@@ -24,7 +25,11 @@ export default function VendorDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const toast = useToast();
+  const { can } = useAuth();
+  const canApprove = can('vendors.approve');
+  const canManage = can('vendors.manage');
   const [vendor, setVendor] = useState(null);
+  const [technicians, setTechnicians] = useState([]);
   const [loading, setLoading] = useState(true);
   const [confirm, setConfirm] = useState(null);
   const [rejectOpen, setRejectOpen] = useState(false);
@@ -42,6 +47,10 @@ export default function VendorDetail() {
       })
       .catch((err) => toast.error(getError(err)))
       .finally(() => setLoading(false));
+    vendorsApi
+      .technicians(id)
+      .then((res) => setTechnicians(res.data.data))
+      .catch(() => setTechnicians([]));
   };
 
   useEffect(load, [id]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -114,13 +123,13 @@ export default function VendorDetail() {
           </div>
         </div>
         <div className="flex flex-wrap gap-2">
-          {vendor.status === 'pending' && (
+          {vendor.status === 'pending' && canApprove && (
             <>
               <Button variant="success" icon={CheckCircle2} onClick={() => setConfirm('approve')}>Approve</Button>
               <Button variant="danger" icon={XCircle} onClick={() => setRejectOpen(true)}>Reject</Button>
             </>
           )}
-          {vendor.status !== 'pending' && (
+          {vendor.status !== 'pending' && canManage && (
             <Button variant="secondary" icon={PauseCircle} onClick={() => setStatusOpen(true)}>Change status</Button>
           )}
         </div>
@@ -208,7 +217,9 @@ export default function VendorDetail() {
           <CardBody>
             <div className="grid sm:grid-cols-2 gap-x-8">
               <InfoRow label="Owner" value={vendor.name} />
-              <InfoRow label="Email" value={<span className="inline-flex items-center gap-1.5"><Mail className="w-3.5 h-3.5 text-slate-400" />{vendor.email}</span>} />
+              <InfoRow label="Email" value={vendor.email
+                ? <span className="inline-flex items-center gap-1.5"><Mail className="w-3.5 h-3.5 text-slate-400" />{vendor.email}</span>
+                : '—'} />
               <InfoRow label="Phone" value={<span className="inline-flex items-center gap-1.5"><Phone className="w-3.5 h-3.5 text-slate-400" />{vendor.phone}</span>} />
               <InfoRow label="City" value={<span className="inline-flex items-center gap-1.5"><MapPin className="w-3.5 h-3.5 text-slate-400" />{vendor.city || '—'}</span>} />
               <InfoRow label="State" value={vendor.state} />
@@ -274,6 +285,58 @@ export default function VendorDetail() {
                     <TD><StatusBadge status={j.stage} /></TD>
                     <TD className="hidden sm:table-cell text-slate-500">{fmtDate(j.schedule_date)}</TD>
                     <TD align="right" className="font-bold text-emerald-600">{fmtMoney(j.amount)}</TD>
+                  </TRow>
+                ))}
+              </tbody>
+            </Table>
+          )}
+        </Card>
+
+        {/* ============ Technicians ============ */}
+        <Card className="lg:col-span-3 animate-fade-up overflow-hidden" style={{ animationDelay: '240ms' }}>
+          <CardHeader icon={HardHat} title="Technicians" subtitle="Staff added by the service owner" />
+          {!technicians.length ? (
+            <EmptyState title="No technicians yet" message="The owner adds technicians from the vendor app — they show up here." />
+          ) : (
+            <Table>
+              <thead>
+                <tr>
+                  <TH>Name</TH>
+                  <TH className="hidden sm:table-cell">Phone</TH>
+                  <TH className="hidden md:table-cell">Skill</TH>
+                  <TH>Status</TH>
+                  <TH>Today</TH>
+                  <TH align="right" className="hidden sm:table-cell">Present (30d)</TH>
+                </tr>
+              </thead>
+              <tbody>
+                {technicians.map((t) => (
+                  <TRow key={t.id}>
+                    <TD>
+                      <span className="inline-flex items-center gap-2">
+                        <span className="h-7 w-7 rounded-lg bg-gradient-to-br from-violet-500/10 to-fuchsia-500/10 ring-1 ring-violet-500/15 flex items-center justify-center">
+                          <HardHat className="w-3.5 h-3.5 text-violet-600" />
+                        </span>
+                        <span className="font-semibold text-slate-900">{t.name}</span>
+                      </span>
+                    </TD>
+                    <TD className="hidden sm:table-cell text-slate-600">{t.phone || '—'}</TD>
+                    <TD className="hidden md:table-cell text-slate-600">{t.skill || '—'}</TD>
+                    <TD><StatusBadge status={t.status} /></TD>
+                    <TD>
+                      {t.today_status ? (
+                        <Badge tone={
+                          t.today_status === 'present' ? 'success'
+                            : t.today_status === 'absent' ? 'danger'
+                            : t.today_status === 'late' ? 'warning' : 'brand'
+                        }>
+                          {labelize(t.today_status)}
+                        </Badge>
+                      ) : (
+                        <span className="text-xs text-slate-400">Not marked</span>
+                      )}
+                    </TD>
+                    <TD align="right" className="hidden sm:table-cell font-bold text-slate-700">{Number(t.present_30d || 0)}</TD>
                   </TRow>
                 ))}
               </tbody>

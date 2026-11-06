@@ -2,13 +2,15 @@ import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Building2, RotateCcw, SearchX, MapPin, Star, CheckCircle2, CalendarDays,
-  List, LayoutGrid,
+  List, LayoutGrid, XCircle,
 } from 'lucide-react';
 import { vendorsApi } from '../../api/endpoints';
 import { getError } from '../../api/client';
+import { useAuth } from '../../context/AuthContext';
 import {
   Card, CardBody, Table, TH, TD, TRow, Pagination, SearchInput,
   Button, StatusBadge, TableSkeleton, EmptyState, Avatar, useToast, ConfirmDialog,
+  Modal, Input,
 } from '../../components/ui';
 import { fmtDate, timeAgo, fmtNum, cx } from '../../lib/utils';
 
@@ -23,6 +25,8 @@ const STATUS_TABS = [
 export default function Vendors() {
   const navigate = useNavigate();
   const toast = useToast();
+  const { can } = useAuth();
+  const canApprove = can('vendors.approve');
   const [items, setItems] = useState([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
@@ -33,6 +37,8 @@ export default function Vendors() {
   const [loading, setLoading] = useState(true);
   const [counts, setCounts] = useState({});
   const [approveFor, setApproveFor] = useState(null);
+  const [rejectFor, setRejectFor] = useState(null);
+  const [rejectReason, setRejectReason] = useState('');
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -66,6 +72,23 @@ export default function Vendors() {
       await vendorsApi.approve(approveFor.id);
       toast.success('Vendor approved');
       setApproveFor(null);
+      load();
+      vendorsApi.stats().then((res) => {
+        const map = {};
+        res.data.data.forEach((r) => (map[r.status] = Number(r.count)));
+        setCounts(map);
+      }).catch(() => {});
+    } catch (err) {
+      toast.error(getError(err));
+    }
+  };
+
+  const reject = async () => {
+    try {
+      await vendorsApi.reject(rejectFor.id, rejectReason);
+      toast.success('Vendor rejected');
+      setRejectFor(null);
+      setRejectReason('');
       load();
       vendorsApi.stats().then((res) => {
         const map = {};
@@ -215,7 +238,7 @@ export default function Vendors() {
                       </div>
                       <div className="min-w-0">
                         <p className="font-semibold text-slate-900 truncate">{v.business_name}</p>
-                        <p className="text-xs text-slate-500 truncate">{v.name} · {v.email}</p>
+                        <p className="text-xs text-slate-500 truncate">{v.name}{v.email ? ` · ${v.email}` : ''}</p>
                       </div>
                     </div>
                   </TD>
@@ -241,16 +264,27 @@ export default function Vendors() {
                   </TD>
                   <TD align="right">
                     <div className="flex justify-end gap-1" onClick={(e) => e.stopPropagation()}>
-                      {v.status === 'pending' && (
-                        <Button
-                          size="icon"
-                          variant="ghost"
-                          title="Approve"
-                          className="text-emerald-600 hover:bg-emerald-50"
-                          onClick={() => setApproveFor({ id: v.id, name: v.business_name })}
-                        >
-                          <CheckCircle2 className="w-4 h-4" />
-                        </Button>
+                      {v.status === 'pending' && canApprove && (
+                        <>
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            title="Approve"
+                            className="text-emerald-600 hover:bg-emerald-50"
+                            onClick={() => setApproveFor({ id: v.id, name: v.business_name })}
+                          >
+                            <CheckCircle2 className="w-4 h-4" />
+                          </Button>
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            title="Reject"
+                            className="text-rose-600 hover:bg-rose-50"
+                            onClick={() => { setRejectFor({ id: v.id, name: v.business_name }); setRejectReason(''); }}
+                          >
+                            <XCircle className="w-4 h-4" />
+                          </Button>
+                        </>
                       )}
                       <Button size="sm" variant="secondary" onClick={() => navigate(`/vendors/${v.id}`)}>
                         Manage
@@ -285,7 +319,7 @@ export default function Vendors() {
                   <StatusBadge status={v.status} />
                 </div>
                 <p className="relative font-semibold text-slate-900 mt-4 truncate">{v.business_name}</p>
-                <p className="relative text-sm text-slate-500 truncate mt-0.5">{v.name} · {v.email}</p>
+                <p className="relative text-sm text-slate-500 truncate mt-0.5">{v.name}{v.email ? ` · ${v.email}` : ''}</p>
                 <p className="relative text-xs text-slate-400 truncate flex items-center gap-1.5 mt-1">
                   <MapPin className="w-3 h-3 shrink-0" /> {v.city || 'Location TBD'}
                 </p>
@@ -304,12 +338,17 @@ export default function Vendors() {
                   </div>
                 </div>
                 <div className="relative flex gap-2 mt-4 pt-4 border-t border-slate-100" onClick={(e) => e.stopPropagation()}>
-                  {v.status === 'pending' && (
-                    <Button size="sm" variant="success" icon={CheckCircle2} onClick={() => setApproveFor({ id: v.id, name: v.business_name })} className="flex-1">
-                      Approve
-                    </Button>
+                  {v.status === 'pending' && canApprove && (
+                    <>
+                      <Button size="sm" variant="success" icon={CheckCircle2} onClick={() => setApproveFor({ id: v.id, name: v.business_name })} className="flex-1">
+                        Approve
+                      </Button>
+                      <Button size="sm" variant="danger" icon={XCircle} onClick={() => { setRejectFor({ id: v.id, name: v.business_name }); setRejectReason(''); }}>
+                        Reject
+                      </Button>
+                    </>
                   )}
-                  <Button size="sm" variant="secondary" icon={CalendarDays} onClick={() => navigate(`/vendors/${v.id}`)} className={v.status === 'pending' ? '' : 'flex-1'}>
+                  <Button size="sm" variant="secondary" icon={CalendarDays} onClick={() => navigate(`/vendors/${v.id}`)} className={v.status === 'pending' && canApprove ? '' : 'flex-1'}>
                     Manage
                   </Button>
                 </div>
@@ -331,6 +370,24 @@ export default function Vendors() {
         confirmText="Approve"
         tone="success"
       />
+
+      <Modal
+        open={!!rejectFor}
+        onClose={() => setRejectFor(null)}
+        title="Reject vendor"
+        size="sm"
+        footer={
+          <>
+            <Button variant="secondary" onClick={() => setRejectFor(null)}>Cancel</Button>
+            <Button variant="danger" onClick={reject}>Reject</Button>
+          </>
+        }
+      >
+        <p className="text-sm text-slate-500 mb-3">
+          <span className="font-semibold text-slate-700">{rejectFor?.name}</span> will be marked as rejected. The owner is notified with your reason.
+        </p>
+        <Input label="Rejection reason" value={rejectReason} onChange={(e) => setRejectReason(e.target.value)} placeholder="Did not meet criteria…" />
+      </Modal>
     </>
   );
 }

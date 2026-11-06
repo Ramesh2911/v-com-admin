@@ -30,6 +30,7 @@ export const vendorsApi = {
   reject: (id, reason) => api.post(`/admin/vendors/${id}/reject`, { reason }),
   setStatus: (id, status) => api.patch(`/admin/vendors/${id}/status`, { status }),
   assignments: (id) => api.get(`/admin/vendors/${id}/assignments`),
+  technicians: (id) => api.get(`/admin/vendors/${id}/technicians`),
 };
 
 export const requestsApi = {

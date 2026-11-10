@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
   ArrowLeft, CheckCircle2, XCircle, PauseCircle, MapPin, Phone, Mail,
-  Briefcase, Star, Wrench, CalendarDays, Building2, HardHat,
+  Briefcase, Star, Wrench, CalendarDays, Building2, HardHat, ShieldCheck, Image as ImageIcon,
 } from 'lucide-react';
 import { vendorsApi } from '../../api/endpoints';
 import { getError } from '../../api/client';
@@ -247,6 +247,43 @@ export default function VendorDetail() {
               ) : (
                 <p className="text-sm text-slate-400">No categories assigned</p>
               )}
+            </div>
+          </CardBody>
+        </Card>
+
+        {/* ============ KYC documents ============ */}
+        <Card className="lg:col-span-3 animate-fade-up overflow-hidden" style={{ animationDelay: '160ms' }}>
+          <CardHeader icon={ShieldCheck} title="KYC documents" subtitle="Submitted at registration" />
+          <CardBody>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+              {[
+                { label: 'Photo', url: vendor.photo },
+                { label: 'Aadhar front', url: vendor.aadhar_front },
+                { label: 'Aadhar back', url: vendor.aadhar_back },
+                { label: 'PAN front', url: vendor.pan_front },
+                { label: 'PAN back', url: vendor.pan_back },
+              ].map((doc) => (
+                <div key={doc.label}>
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">{doc.label}</p>
+                  {doc.url ? (
+                    <button
+                      onClick={() => window.open(doc.url, '_blank', 'noopener')}
+                      className="group relative block w-full h-28 rounded-xl overflow-hidden ring-1 ring-slate-200 bg-slate-50 hover:ring-violet-300 transition-all"
+                      title="Open full document"
+                    >
+                      <img src={doc.url} alt={doc.label} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200" />
+                      <span className="absolute inset-0 bg-slate-950/0 group-hover:bg-slate-950/30 transition-colors flex items-center justify-center">
+                        <ImageIcon className="w-5 h-5 text-white opacity-0 group-hover:opacity-100 transition-opacity drop-shadow" />
+                      </span>
+                    </button>
+                  ) : (
+                    <div className="h-28 rounded-xl ring-1 ring-dashed ring-slate-200 bg-slate-50 flex flex-col items-center justify-center text-slate-400">
+                      <ImageIcon className="w-5 h-5 mb-1" />
+                      <span className="text-[10px] font-semibold">Not provided</span>
+                    </div>
+                  )}
+                </div>
+              ))}
             </div>
           </CardBody>
         </Card>

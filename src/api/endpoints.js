@@ -89,6 +89,13 @@ export const offersApi = {
   deleteCoupon: (id) => api.delete(`/admin/coupons/${id}`),
 };
 
+export const bannersApi = {
+  list: () => api.get('/admin/banners'),
+  create: (data) => api.post('/admin/banners', data),
+  update: (id, data) => api.put(`/admin/banners/${id}`, data),
+  remove: (id) => api.delete(`/admin/banners/${id}`),
+};
+
 export const reviewsApi = {
   list: (params) => api.get('/admin/reviews', { params }),
   setStatus: (id, status) => api.patch(`/admin/reviews/${id}`, { status }),

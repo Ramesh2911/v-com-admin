@@ -21,6 +21,7 @@ import Areas from './pages/properties/Areas';
 import PropertyEnquiries from './pages/properties/PropertyEnquiries';
 import Services from './pages/services/Services';
 import Offers from './pages/offers/Offers';
+import Banners from './pages/banners/Banners';
 import Reviews from './pages/reviews/Reviews';
 import Employees from './pages/hr/Employees';
 import Attendance from './pages/hr/Attendance';
@@ -78,6 +79,7 @@ export default function App() {
 
           <Route path="services" element={<Guard perm="services.view"><Services /></Guard>} />
           <Route path="offers" element={<Guard perm="offers.view"><Offers /></Guard>} />
+          <Route path="banners" element={<Guard perm="banners.view"><Banners /></Guard>} />
           <Route path="reviews" element={<Guard perm="reviews.view"><Reviews /></Guard>} />
 
           <Route path="hr" element={<Guard perm="hr.view"><Employees /></Guard>} />

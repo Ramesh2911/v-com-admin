@@ -116,6 +116,18 @@ const ICON_OPTIONS = [
   { v: 'sparkles', label: '✨ Sparkles' },
 ];
 
+/* Admin-manageable card theme presets (mirror server src/modules/services/themes.js) */
+const THEME_OPTIONS = [
+  { v: '', label: 'Auto', hint: 'icon-based gradient',
+    colors: null },
+  { v: 'quick', label: 'Quick', hint: 'black bg · white text',
+    colors: { background: '#0F172A', text: '#FFFFFF', accent: '#FFFFFF', on_accent: '#0F172A' } },
+  { v: 'special', label: 'Special', hint: 'light blue bg · black text',
+    colors: { background: '#DBEAFE', text: '#0F172A', accent: '#0F172A', on_accent: '#FFFFFF' } },
+  { v: 'professional', label: 'Professional', hint: 'white bg · cream theme',
+    colors: { background: '#FFFFFF', text: '#1F2937', accent: '#FFF3D6', on_accent: '#1F2937' } },
+];
+
 /* Image picker — Cloudinary-backed via FormData (optional) */
 function ImagePicker({ preview, onChange, onRemove }) {
   return (
@@ -163,7 +175,7 @@ export default function Services() {
   const [modal, setModal] = useState(null);
   const [catModal, setCatModal] = useState(null);
   const [del, setDel] = useState(null);
-  const [form, setForm] = useState({ code: '', name: '', description: '', icon: '', sort_order: 0, status: 1 });
+  const [form, setForm] = useState({ code: '', name: '', description: '', icon: '', theme: '', sort_order: 0, status: 1 });
   const [catForm, setCatForm] = useState({ module_id: '', name: '', description: '', price: '', is_featured: 0, status: 1, sort_order: 0 });
   const [formImage, setFormImage] = useState(null);
   const [formImagePreview, setFormImagePreview] = useState(null);
@@ -194,10 +206,10 @@ export default function Services() {
   };
   const openModuleModal = (m) => {
     if (m === 'new') {
-      setForm({ code: '', name: '', description: '', icon: '', sort_order: 0, status: 1 });
+      setForm({ code: '', name: '', description: '', icon: '', theme: '', sort_order: 0, status: 1 });
       setFormImage(null); setFormImagePreview(null);
     } else {
-      setForm({ code: m.code, name: m.name, description: m.description || '', icon: m.icon || '', sort_order: m.sort_order, status: m.status });
+      setForm({ code: m.code, name: m.name, description: m.description || '', icon: m.icon || '', theme: m.theme || '', sort_order: m.sort_order, status: m.status });
       setFormImage(null); setFormImagePreview(m.image || null);
     }
     setModal(m);
@@ -230,8 +242,10 @@ export default function Services() {
     try {
       const fd = new FormData();
       Object.entries(form).forEach(([k, v]) => {
+        if (k === 'theme') return;
         if (v !== '' && v != null) fd.append(k, v);
       });
+      fd.append('theme', form.theme || ''); // '' clears back to Auto
       if (formImage) fd.append('image', formImage);
       if (modal === 'new') { await servicesApi.createModule(fd); toast.success('Category created'); }
       else { await servicesApi.updateModule(modal.id, fd); toast.success('Category updated'); }
@@ -405,6 +419,8 @@ export default function Services() {
     table: { style: { fontFamily: 'inherit' } },
   };
 
+  const pc = THEME_OPTIONS.find((t) => t.v === form.theme)?.colors;
+
   return (
     <>
       {/* ============ Header ============ */}
@@ -488,6 +504,7 @@ export default function Services() {
             {modules.map((m, i) => {
               const th = themeFor(m);
               const Ico = th.icon;
+              const c = m.colors || null; // resolved preset colors from API (null = Auto gradient)
               const catCount = m.category_count ?? 0;
               return (
                 <Card
@@ -495,8 +512,11 @@ export default function Services() {
                   className="group relative overflow-hidden animate-fade-up"
                   style={{ animationDelay: `${i * 60}ms` }}
                 >
-                  {/* vivid gradient banner */}
-                  <div className={cx('relative h-24 bg-gradient-to-br overflow-hidden', th.grad, th.glow)}>
+                  {/* banner: theme colors when set, else vivid gradient */}
+                  <div
+                    className={cx('relative h-24 overflow-hidden', !c && 'bg-gradient-to-br', !c && th.grad, !c && th.glow)}
+                    style={c ? { background: c.background } : undefined}
+                  >
                     {m.image && (
                       <>
                         <img src={m.image} alt="" className="absolute inset-0 h-full w-full object-cover" />
@@ -508,27 +528,36 @@ export default function Services() {
                     <div className="absolute -bottom-8 -left-6 h-24 w-24 rounded-full bg-white/15 blur-xl" />
                     {/* big icon */}
                     <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="h-14 w-14 rounded-2xl bg-white/25 backdrop-blur-sm ring-1 ring-white/40 flex items-center justify-center shadow-lg transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-6">
-                        <Ico className="w-7 h-7 text-white drop-shadow" />
+                      <div
+                        className={cx(
+                          'h-14 w-14 rounded-2xl flex items-center justify-center shadow-lg transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-6 ring-1',
+                          c ? 'ring-black/10' : 'bg-white/25 backdrop-blur-sm ring-white/40'
+                        )}
+                        style={c ? { background: c.accent } : undefined}
+                      >
+                        <Ico
+                          className={cx('w-7 h-7 drop-shadow', !c && 'text-white')}
+                          style={c ? { color: c.on_accent } : undefined}
+                        />
                       </div>
                     </div>
                     {/* status + actions overlay */}
                     <div className="absolute top-2.5 left-2.5">
-                      <Badge tone={m.status ? 'emerald' : 'slate'} dot className="font-bold bg-white/90 backdrop-blur">
+                      <Badge tone={m.status ? 'emerald' : 'slate'} dot className={cx('font-bold bg-white/90 backdrop-blur', c && 'ring-1 ring-slate-200')}>
                         {m.status ? 'Active' : 'Hidden'}
                       </Badge>
                     </div>
                     <div className="absolute top-2.5 right-2.5 flex gap-1 opacity-0 group-hover:opacity-100 translate-y-1 group-hover:translate-y-0 transition-all duration-200">
                       <button
                         onClick={() => openModuleModal(m)}
-                        className="h-8 w-8 rounded-lg bg-white/90 backdrop-blur text-slate-700 hover:bg-white hover:text-brand-600 flex items-center justify-center shadow-md transition"
+                        className={cx('h-8 w-8 rounded-lg bg-white/90 backdrop-blur text-slate-700 hover:bg-white hover:text-brand-600 flex items-center justify-center shadow-md transition', c && 'ring-1 ring-slate-200')}
                         aria-label="Edit module"
                       >
                         <Pencil className="w-3.5 h-3.5" />
                       </button>
                       <button
                         onClick={() => setDel({ ...m, kind: 'module' })}
-                        className="h-8 w-8 rounded-lg bg-white/90 backdrop-blur text-rose-600 hover:bg-rose-50 hover:text-rose-700 flex items-center justify-center shadow-md transition"
+                        className={cx('h-8 w-8 rounded-lg bg-white/90 backdrop-blur text-rose-600 hover:bg-rose-50 hover:text-rose-700 flex items-center justify-center shadow-md transition', c && 'ring-1 ring-slate-200')}
                         aria-label="Delete module"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
@@ -548,7 +577,10 @@ export default function Services() {
                     </div>
                     <p className="text-sm text-slate-500 mt-2 line-clamp-2 min-h-[2.5rem]">{m.description}</p>
                     <div className="flex flex-wrap gap-2 mt-3 pt-3 border-t border-slate-100">
-                      <span className={cx('inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-bold ring-1', th.chip)}>
+                      <span
+                        className={cx('inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-bold ring-1', !c && th.chip)}
+                        style={c ? { background: c.background, color: c.text, borderColor: 'rgba(15,23,42,0.12)' } : undefined}
+                      >
                         <FolderOpen className="w-3 h-3" /> {catCount} {catCount === 1 ? 'category' : 'categories'}
                       </span>
                       <Badge tone="slate" className="font-bold">
@@ -655,19 +687,38 @@ export default function Services() {
         <div className="space-y-4">
           {/* live preview */}
           <div className="rounded-2xl border border-slate-100 overflow-hidden">
-            <div className={cx('relative h-16 bg-gradient-to-br flex items-center gap-3 px-4', themeFor({ icon: form.icon, code: form.code }).grad)}>
+            <div
+              className={cx('relative h-16 flex items-center gap-3 px-4', !pc && 'bg-gradient-to-br', !pc && themeFor({ icon: form.icon, code: form.code }).grad)}
+              style={pc ? { background: pc.background } : undefined}
+            >
               {formImagePreview && (
                 <>
                   <img src={formImagePreview} alt="" className="absolute inset-0 h-full w-full object-cover z-0" />
                   <span className="absolute inset-0 bg-slate-900/45 z-[1]" />
                 </>
               )}
-              <span className="relative z-10 h-9 w-9 rounded-xl bg-white/25 backdrop-blur ring-1 ring-white/40 flex items-center justify-center">
-                {(() => { const Ico = themeFor({ icon: form.icon, code: form.code }).icon; return <Ico className="w-4.5 h-4.5 text-white" />; })()}
+              <span
+                className={cx('relative z-10 h-9 w-9 rounded-xl flex items-center justify-center ring-1', pc ? 'ring-black/10' : 'bg-white/25 backdrop-blur ring-white/40')}
+                style={pc ? { background: pc.accent } : undefined}
+              >
+                {(() => {
+                  const Ico = themeFor({ icon: form.icon, code: form.code }).icon;
+                  return <Ico className={cx('w-4.5 h-4.5', !pc && 'text-white')} style={pc ? { color: pc.on_accent } : undefined} />;
+                })()}
               </span>
               <div className="relative z-10">
-                <p className="font-display font-bold text-white text-sm drop-shadow">{form.name || 'Category name'}</p>
-                <p className="font-mono text-[10px] text-white/80">{form.code || 'category-code'}</p>
+                <p
+                  className={cx('font-display font-bold text-sm drop-shadow', !pc && 'text-white')}
+                  style={pc ? { color: pc.text } : undefined}
+                >
+                  {form.name || 'Category name'}
+                </p>
+                <p
+                  className={cx('font-mono text-[10px]', !pc && 'text-white/80')}
+                  style={pc ? { color: pc.text, opacity: 0.7 } : undefined}
+                >
+                  {form.code || 'category-code'}
+                </p>
               </div>
               <span className="relative z-10 ml-auto text-2xl select-none">{themeFor({ icon: form.icon, code: form.code }).emoji}</span>
             </div>
@@ -694,6 +745,41 @@ export default function Services() {
                 </button>
               ))}
             </div>
+          </div>
+          <div>
+            <label className="block text-sm font-semibold text-slate-700 mb-1.5">Card theme</label>
+            <div className="grid grid-cols-2 gap-2">
+              {THEME_OPTIONS.map((t) => (
+                <button
+                  key={t.v || 'auto'}
+                  type="button"
+                  onClick={() => setForm({ ...form, theme: t.v })}
+                  className={cx(
+                    'flex items-center gap-2.5 rounded-xl border-2 px-3 py-2.5 text-left transition-all duration-150',
+                    form.theme === t.v
+                      ? 'border-brand-500 ring-2 ring-brand-200 bg-brand-50/40'
+                      : 'border-slate-200 hover:border-slate-300 bg-white'
+                  )}
+                >
+                  <span
+                    className="h-8 w-12 rounded-md shrink-0 ring-1 ring-black/10 flex items-center justify-center overflow-hidden"
+                    style={t.colors ? { background: t.colors.background } : { background: 'linear-gradient(135deg,#818cf8,#d946ef)' }}
+                  >
+                    <span
+                      className="text-[9px] font-extrabold"
+                      style={{ color: t.colors ? t.colors.text : '#FFFFFF' }}
+                    >
+                      Aa
+                    </span>
+                  </span>
+                  <span className="min-w-0">
+                    <span className="block text-xs font-bold text-slate-800">{t.label}</span>
+                    <span className="block text-[10px] text-slate-400 truncate">{t.hint}</span>
+                  </span>
+                </button>
+              ))}
+            </div>
+            <p className="mt-1.5 text-[11px] text-slate-400">Theme colors are sent to the app in the GET response (<span className="font-mono">colors</span> object). Auto = icon-based gradient.</p>
           </div>
           <div className="grid grid-cols-2 gap-4">
             <Input label="Sort order" type="number" value={form.sort_order} onChange={(e) => setForm({ ...form, sort_order: e.target.value })} />

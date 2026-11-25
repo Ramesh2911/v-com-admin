@@ -280,8 +280,8 @@ export default function Services() {
     } catch (e) { toast.error(getError(e)); }
   };
 
-  const totalCats = categories.length;
-  const featuredCats = categories.filter((c) => Number(c.is_featured) === 1).length;
+  const totalCats = categories.filter((c) => Number(c.status) === 1).length;
+  const featuredCats = categories.filter((c) => Number(c.is_featured) === 1 && Number(c.status) === 1).length;
   const activeModules = modules.filter((m) => m.status).length;
 
   const term = q.trim().toLowerCase();
@@ -454,7 +454,7 @@ export default function Services() {
         <div className="flex items-center gap-1.5 p-1.5 bg-slate-100 rounded-2xl w-fit">
           {[
             { value: 'modules', label: 'Categories', count: modules.length, icon: Layers },
-            { value: 'categories', label: 'Services', count: categories.length, icon: FolderOpen },
+            { value: 'categories', label: 'Services', count: totalCats, icon: FolderOpen },
           ].map((t) => {
             const active = tab === t.value;
             return (
@@ -619,7 +619,7 @@ export default function Services() {
               </div>
               <div>
                 <h3 className="font-display font-bold text-slate-900">Services</h3>
-                <p className="text-sm text-slate-500">{categories.length} services across {modules.length} categories</p>
+                <p className="text-sm text-slate-500">{totalCats} active services across {modules.length} categories{categories.length !== totalCats ? ` (${categories.length - totalCats} hidden)` : ''}</p>
               </div>
             </div>
             <Button icon={Plus} onClick={() => openCatModal('new')}>Add Service</Button>
@@ -644,7 +644,7 @@ export default function Services() {
               subHeaderComponent={
                 <div className="flex w-full flex-wrap items-center justify-between gap-3">
                   <p className="text-xs font-bold uppercase tracking-wider text-slate-400">
-                    {filteredCats.length} of {categories.length} shown
+                    {filteredCats.length} of {categories.length} shown{filteredCats.filter((c) => Number(c.status) !== 1).length ? ` · ${filteredCats.filter((c) => Number(c.status) !== 1).length} hidden` : ''}
                   </p>
                   <SearchInput value={q} onChange={setQ} placeholder="Search services…" className="w-full sm:w-72" />
                 </div>

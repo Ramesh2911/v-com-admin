@@ -107,6 +107,8 @@ export default function Dashboard() {
   const modChart = (activeMod?.days || []).map((d) => ({ date: shortDate(d.date), count: d.count }));
   const modTotal = activeMod?.total ?? 0;
   const modPeak = modChart.length ? Math.max(...modChart.map((d) => d.count)) : 0;
+  const modDays = activeMod?.days || [];
+  const modToday = modDays.length ? Number(modDays[modDays.length - 1].count) || 0 : 0;
 
   const total14 = chartData.reduce((s, d) => s + d.requests, 0);
   const peak14 = chartData.length ? Math.max(...chartData.map((d) => d.requests)) : 0;
@@ -207,19 +209,36 @@ export default function Dashboard() {
       </div>
 
       {/* ============ Charts ============ */}
-      <div className="grid lg:grid-cols-3 gap-6 mb-6">
-        <Card className="lg:col-span-2 animate-fade-up" style={{ animationDelay: '680ms' }}>
+      <div className="grid gap-6 mb-6">
+        <Card className="animate-fade-up" style={{ animationDelay: '680ms' }}>
           <CardHeader
             icon={Activity}
             title="Request Volume"
-            subtitle="Last 14 days"
+            subtitle={`Last ${rangeDays} days`}
             actions={
-              <span className="text-xs font-semibold text-slate-600 bg-slate-100/80 ring-1 ring-slate-200 px-2.5 py-1 rounded-lg">
-                {fmtNum(total14)} total · peak {peak14}
-              </span>
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-semibold text-slate-600 bg-slate-100/80 ring-1 ring-slate-200 px-2.5 py-1 rounded-lg">
+                  {fmtNum(total14)} total · peak {peak14}
+                </span>
+                <div className="flex items-center gap-1 rounded-lg bg-slate-100 p-0.5">
+                  {[7, 14, 30].map((d) => (
+                    <button
+                      key={d}
+                      type="button"
+                      onClick={() => setRangeDays(d)}
+                      className={cx(
+                        'px-2 py-1 rounded-md text-[11px] font-bold transition-all',
+                        rangeDays === d ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700'
+                      )}
+                    >
+                      {d}d
+                    </button>
+                  ))}
+                </div>
+              </div>
             }
           />
-          <CardBody className="h-[280px] pt-4">
+          <CardBody className="h-[240px] pt-4">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={chartData} margin={{ left: -20, right: 8, top: 4 }}>
                 <defs>
@@ -241,12 +260,12 @@ export default function Dashboard() {
           </CardBody>
         </Card>
 
-        {/* ---- Module Requests: per-day counts per module (tabs + range) ---- */}
+        {/* ---- Module tab: daily request count per module (full width) ---- */}
         <Card className="animate-fade-up" style={{ animationDelay: '740ms' }}>
           <CardHeader
             icon={BarChart3}
             title="Module Requests"
-            subtitle="Per-day count by module"
+            subtitle="Daily request count by module"
             actions={
               <div className="flex items-center gap-1 rounded-lg bg-slate-100 p-0.5">
                 {[7, 14, 30].map((d) => (
@@ -265,51 +284,112 @@ export default function Dashboard() {
               </div>
             }
           />
-          <CardBody className="h-[280px] pt-4 flex flex-col">
+          <CardBody className="pt-4">
             {tabMods.length === 0 ? (
               <EmptyState title="No modules" message="Module data unavailable." />
             ) : (
               <>
-                <div className="flex items-center gap-1 rounded-xl bg-slate-100 p-1 mb-3">
+                {/* module tabs with count badges */}
+                <div className="flex items-center gap-2 rounded-xl bg-slate-100 p-1 mb-4 overflow-x-auto">
                   {tabMods.map((m) => (
                     <button
                       key={m.module_code}
                       type="button"
                       onClick={() => setModuleTab(m.module_code)}
                       className={cx(
-                        'flex-1 px-2 py-1.5 rounded-lg text-[11px] font-bold transition-all truncate',
+                        'flex-1 min-w-[140px] flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-xs font-bold transition-all',
                         activeMod?.module_code === m.module_code
                           ? 'bg-white text-slate-900 shadow-sm'
                           : 'text-slate-500 hover:text-slate-700'
                       )}
                       title={m.module_name}
                     >
-                      {m.module_name}
+                      <span className="truncate">{m.module_name}</span>
+                      <span
+                        className={cx(
+                          'inline-flex items-center justify-center min-w-[26px] h-5 px-1.5 rounded-full text-[10px] font-extrabold tabular-nums',
+                          activeMod?.module_code === m.module_code
+                            ? 'bg-brand-100 text-brand-700'
+                            : 'bg-slate-200 text-slate-600'
+                        )}
+                      >
+                        {fmtNum(m.total)}
+                      </span>
                     </button>
                   ))}
                 </div>
-                <div className="flex items-center justify-between mb-1 px-0.5">
-                  <span className="text-xs font-semibold text-slate-500">
-                    {fmtNum(modTotal)} in last {rangeDays} days
-                  </span>
+
+                {/* summary row */}
+                <div className="flex flex-wrap items-center justify-between gap-2 mb-2 px-0.5">
+                  <div className="flex items-center gap-2 text-xs font-semibold text-slate-600">
+                    <span className="inline-flex items-center gap-1.5">
+                      <span className="h-2 w-2 rounded-full bg-brand-500" />
+                      {activeMod?.module_name}
+                    </span>
+                    <span className="text-slate-400">·</span>
+                    <span>{fmtNum(modTotal)} in last {rangeDays} days</span>
+                    <span className="text-slate-400">·</span>
+                    <span className="text-emerald-600">today {fmtNum(modToday)}</span>
+                  </div>
                   <span className="text-[11px] font-bold text-violet-600 bg-violet-50 ring-1 ring-violet-200 px-2 py-0.5 rounded-md">
                     peak {modPeak}
                   </span>
                 </div>
-                <div className="flex-1 min-h-0">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={modChart} margin={{ left: -22, right: 6, top: 4 }}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#eef2f7" vertical={false} />
-                      <XAxis dataKey="date" tick={{ fontSize: 10, fill: '#94a3b8' }} tickLine={false} axisLine={false} interval="preserveStartEnd" />
-                      <YAxis tick={{ fontSize: 11, fill: '#94a3b8' }} tickLine={false} axisLine={false} allowDecimals={false} />
-                      <Tooltip
-                        contentStyle={{ borderRadius: 14, border: '1px solid #e2e8f0', fontSize: 13 }}
-                        cursor={{ fill: 'rgba(99,102,241,0.06)' }}
-                        formatter={(v) => [v, 'Requests']}
-                      />
-                      <Bar dataKey="count" fill="#6366f1" radius={[6, 6, 0, 0]} maxBarSize={26} />
-                    </BarChart>
-                  </ResponsiveContainer>
+
+                {/* chart + daily count list */}
+                <div className="grid lg:grid-cols-3 gap-4">
+                  <div className="lg:col-span-2 h-[260px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={modChart} margin={{ left: -22, right: 6, top: 4 }}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#eef2f7" vertical={false} />
+                        <XAxis dataKey="date" tick={{ fontSize: 10, fill: '#94a3b8' }} tickLine={false} axisLine={false} interval="preserveStartEnd" />
+                        <YAxis tick={{ fontSize: 11, fill: '#94a3b8' }} tickLine={false} axisLine={false} allowDecimals={false} />
+                        <Tooltip
+                          contentStyle={{ borderRadius: 14, border: '1px solid #e2e8f0', fontSize: 13 }}
+                          cursor={{ fill: 'rgba(99,102,241,0.06)' }}
+                          formatter={(v) => [v, 'Requests']}
+                        />
+                        <Bar dataKey="count" fill="#6366f1" radius={[6, 6, 0, 0]} maxBarSize={30} />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+
+                  {/* daily count list */}
+                  <div className="h-[260px] overflow-y-auto rounded-xl bg-slate-50 ring-1 ring-slate-100">
+                    <div className="sticky top-0 flex items-center justify-between px-3 py-2 bg-slate-100/90 backdrop-blur-sm border-b border-slate-200">
+                      <span className="text-[11px] font-extrabold uppercase tracking-wide text-slate-500">Date</span>
+                      <span className="text-[11px] font-extrabold uppercase tracking-wide text-slate-500">Requests</span>
+                    </div>
+                    {[...(activeMod?.days || [])].reverse().map((d, i) => {
+                      const isToday = i === 0;
+                      return (
+                        <div
+                          key={d.date}
+                          className={cx(
+                            'flex items-center justify-between px-3 py-2 border-b border-slate-100 last:border-0',
+                            isToday && 'bg-white'
+                          )}
+                        >
+                          <span className={cx('text-xs', isToday ? 'font-bold text-slate-900' : 'text-slate-600')}>
+                            {shortDate(d.date)}
+                            {isToday && (
+                              <span className="ml-1.5 text-[9px] font-extrabold uppercase text-emerald-600 bg-emerald-50 ring-1 ring-emerald-200 px-1.5 py-0.5 rounded">
+                                today
+                              </span>
+                            )}
+                          </span>
+                          <span
+                            className={cx(
+                              'text-xs font-extrabold tabular-nums',
+                              d.count > 0 ? 'text-brand-700' : 'text-slate-400'
+                            )}
+                          >
+                            {fmtNum(d.count)}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
                 </div>
               </>
             )}

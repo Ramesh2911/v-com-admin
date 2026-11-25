@@ -22,6 +22,8 @@ import PropertyEnquiries from './pages/properties/PropertyEnquiries';
 import Services from './pages/services/Services';
 import Offers from './pages/offers/Offers';
 import Banners from './pages/banners/Banners';
+import Events from './pages/events/Events';
+import Payouts from './pages/payouts/Payouts';
 import Reviews from './pages/reviews/Reviews';
 import Employees from './pages/hr/Employees';
 import Attendance from './pages/hr/Attendance';
@@ -63,6 +65,7 @@ export default function App() {
           <Route path="customers" element={<Guard perm="customers.view"><Customers /></Guard>} />
           <Route path="vendors" element={<Guard perm="vendors.view"><Vendors /></Guard>} />
           <Route path="vendors/:id" element={<Guard perm="vendors.view"><VendorDetail /></Guard>} />
+          <Route path="payouts" element={<Guard perm="payouts.view"><Payouts /></Guard>} />
           <Route path="requests" element={<Guard perm="requests.view"><Requests /></Guard>} />
           <Route path="requests/:id" element={<Guard perm="requests.view"><RequestDetail /></Guard>} />
           <Route path="quotations" element={<Guard perm="quotations.view"><Quotations /></Guard>} />
@@ -80,6 +83,7 @@ export default function App() {
           <Route path="services" element={<Guard perm="services.view"><Services /></Guard>} />
           <Route path="offers" element={<Guard perm="offers.view"><Offers /></Guard>} />
           <Route path="banners" element={<Guard perm="banners.view"><Banners /></Guard>} />
+          <Route path="events" element={<Guard perm="events.view"><Events /></Guard>} />
           <Route path="reviews" element={<Guard perm="reviews.view"><Reviews /></Guard>} />
 
           <Route path="hr" element={<Guard perm="hr.view"><Employees /></Guard>} />

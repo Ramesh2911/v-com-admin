@@ -3,6 +3,7 @@ import {
   LayoutDashboard, Users, Building2, ClipboardList, FileText, Wrench, Siren,
   Building, Palette, BellRing, BarChart3, ShieldCheck, UserCog, LifeBuoy,
   ScrollText, Settings, X, Briefcase, CalendarCheck, Layers, Percent, Star, Image,
+  CalendarDays, Banknote,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { cx } from '../../lib/utils';
@@ -20,6 +21,7 @@ const NAV = [
     items: [
       { to: '/customers', label: 'Customers', icon: Users, perm: 'customers.view' },
       { to: '/vendors', label: 'Vendors', icon: Building2, perm: 'vendors.view' },
+      { to: '/payouts', label: 'Payouts', icon: Banknote, perm: 'payouts.view' },
       { to: '/staff', label: 'Staff Accounts', icon: UserCog, perm: 'staff.manage' },
     ],
   },
@@ -52,6 +54,7 @@ const NAV = [
       { to: '/services', label: 'Services & Content', icon: Palette, perm: 'services.view' },
       { to: '/offers', label: 'Offers & Coupons', icon: Percent, perm: 'offers.view' },
       { to: '/banners', label: 'Banners', icon: Image, perm: 'banners.view' },
+      { to: '/events', label: 'Events', icon: CalendarDays, perm: 'events.view' },
       { to: '/notifications', label: 'Notifications', icon: BellRing, perm: 'notifications.manage' },
     ],
   },

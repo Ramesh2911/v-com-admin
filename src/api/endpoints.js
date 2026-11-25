@@ -11,7 +11,7 @@ export const authApi = {
 };
 
 export const dashboardApi = {
-  get: () => api.get('/admin/dashboard'),
+  get: (params) => api.get('/admin/dashboard', { params }),
 };
 
 export const customersApi = {
@@ -94,6 +94,21 @@ export const bannersApi = {
   create: (data) => api.post('/admin/banners', data),
   update: (id, data) => api.put(`/admin/banners/${id}`, data),
   remove: (id) => api.delete(`/admin/banners/${id}`),
+};
+
+export const eventsAdminApi = {
+  list: (params) => api.get('/admin/events', { params }),
+  create: (data) => api.post('/admin/events', data),
+  update: (id, data) => api.put(`/admin/events/${id}`, data),
+  remove: (id) => api.delete(`/admin/events/${id}`),
+};
+
+export const payoutsApi = {
+  list: (params) => api.get('/admin/payouts', { params }),
+  summary: () => api.get('/admin/payouts/summary'),
+  create: (data) => api.post('/admin/payouts', data),
+  process: (id) => api.patch(`/admin/payouts/${id}/status`, { status: 'processed' }),
+  exportCsv: () => api.get('/admin/payouts/export', { responseType: 'blob' }),
 };
 
 export const reviewsApi = {

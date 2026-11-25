@@ -459,9 +459,11 @@ export default function Offers() {
     },
   ];
 
-  const categoriesForSelect = [...categories].sort((a, b) =>
-    `${a.module_name}${a.sort_order}`.localeCompare(`${b.module_name}${b.sort_order}`)
-  );
+  const categoriesForSelect = categories
+    .filter((c) => Number(c.status) === 1)
+    .sort((a, b) =>
+      `${a.module_name}${a.sort_order}`.localeCompare(`${b.module_name}${b.sort_order}`)
+    );
 
   return (
     <>

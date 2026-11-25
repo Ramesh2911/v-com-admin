@@ -542,7 +542,7 @@ export default function Offers() {
               </div>
               <div>
                 <h3 className="font-display font-bold text-slate-900">Service Offers</h3>
-                <p className="text-sm text-slate-500">{offers.length} offers across {categories.length} services</p>
+                <p className="text-sm text-slate-500">{offers.length} offers across {categoriesForSelect.length} services</p>
               </div>
             </div>
             <Button icon={Plus} onClick={() => openOfferModal('new')}>Add Offer</Button>

@@ -4,8 +4,8 @@ import { Eye, EyeOff, Lock, Mail, ShieldCheck, Zap, ArrowRight, MousePointerClic
 import { useAuth } from '../../context/AuthContext';
 import { Button, Input, useToast } from '../../components/ui';
 import { getError } from '../../api/client';
-import logo from '../../../assets/logo.jpeg';
-import logoIcon from '../../../assets/logo-icon.png';
+import logo from '../../../assets/logo-transparent.png';
+import logoIcon from '../../../assets/logo-icon-transparent.png';
 
 const FEATURES = [
   { icon: Zap, text: 'Requests, quotations & job workflows' },
@@ -71,8 +71,8 @@ export default function Login() {
         {/* brand */}
         <div className="relative animate-fade-up" style={{ animationDelay: '60ms' }}>
           <div className="flex items-center gap-4">
-            <div className="h-24 w-36 rounded-2xl bg-white p-2 ring-1 ring-white/15 shadow-[0_0_60px_-14px_rgba(34,197,94,0.55)] animate-float flex items-center justify-center">
-              <img src={logo} alt="V-COM logo" className="max-h-full max-w-full object-contain" />
+            <div className="h-24 w-36 rounded-2xl p-1 ring-1 ring-white/15 shadow-[0_0_60px_-14px_rgba(34,197,94,0.55)] animate-float flex items-center justify-center">
+              <img src={logo} alt="V-COM logo" className="max-h-full max-w-full object-contain drop-shadow-[0_4px_24px_rgba(0,0,0,0.45)]" />
             </div>
             <div>
               <p className="font-display text-2xl font-extrabold text-white tracking-tight">V-COM</p>
@@ -143,7 +143,7 @@ export default function Login() {
             <img
               src={logoIcon}
               alt="V-COM logo"
-              className="h-14 w-14 rounded-xl bg-white object-contain ring-1 ring-slate-200 shadow-md"
+              className="h-14 w-14 rounded-xl object-contain ring-1 ring-slate-200 shadow-md"
             />
             <span className="font-display text-2xl font-extrabold">V-COM</span>
           </div>

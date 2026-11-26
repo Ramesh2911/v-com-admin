@@ -8,7 +8,7 @@ import { authApi } from '../../api/endpoints';
 import { getError } from '../../api/client';
 import { useAuth } from '../../context/AuthContext';
 import { Button, Input, useToast } from '../../components/ui';
-import logoIcon from '../../../assets/logo-icon.png';
+import logoIcon from '../../../assets/logo-icon-transparent.png';
 
 const STEPS = [
   { icon: Mail, title: 'Enter your email', desc: 'We match it against your account' },
@@ -66,7 +66,7 @@ export default function ForgotPassword() {
             <img
               src={logoIcon}
               alt="V_COM logo"
-              className="h-20 w-20 rounded-2xl bg-white object-contain ring-1 ring-white/15 shadow-[0_0_60px_-14px_rgba(139,92,246,0.55)] animate-float"
+              className="h-20 w-20 rounded-2xl object-contain ring-1 ring-white/15 shadow-[0_0_60px_-14px_rgba(139,92,246,0.55)] animate-float drop-shadow-[0_4px_24px_rgba(0,0,0,0.45)]"
             />
             <div>
               <p className="font-display text-2xl font-extrabold text-white tracking-tight">V_COM</p>

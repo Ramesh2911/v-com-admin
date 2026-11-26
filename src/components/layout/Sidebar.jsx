@@ -7,7 +7,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { cx } from '../../lib/utils';
-import logoIcon from '../../../assets/logo-icon.png';
+import logoIcon from '../../../assets/logo-icon-transparent.png';
 
 const NAV = [
   {
@@ -123,7 +123,7 @@ export default function Sidebar({ onClose }) {
           <img
             src={logoIcon}
             alt="V_COM"
-            className="h-11 w-11 rounded-xl bg-white object-contain ring-1 ring-white/15 shadow-lg shadow-emerald-500/10 shrink-0"
+            className="h-11 w-11 rounded-xl object-contain ring-1 ring-white/15 shadow-lg shadow-emerald-500/10 shrink-0 drop-shadow-[0_2px_12px_rgba(0,0,0,0.4)]"
           />
           <div className="min-w-0">
             <p className="font-display font-extrabold text-[17px] leading-none tracking-tight">V_COM</p>

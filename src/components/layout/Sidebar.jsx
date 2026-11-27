@@ -3,7 +3,7 @@ import {
   LayoutDashboard, Users, Building2, ClipboardList, FileText, Wrench, Siren,
   Building, Palette, BellRing, BarChart3, ShieldCheck, UserCog, LifeBuoy,
   ScrollText, Settings, X, Briefcase, CalendarCheck, Layers, Percent, Star, Image,
-  CalendarDays, Banknote, Hotel, BedDouble,
+  CalendarDays, Banknote, Hotel, BedDouble, Recycle, Truck,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { cx } from '../../lib/utils';
@@ -52,6 +52,13 @@ const NAV = [
       { to: '/hotels/rooms', label: 'Rooms & Tariffs', icon: BedDouble, perm: 'hotel.view' },
       { to: '/hotels/reservations', label: 'Reservations', icon: CalendarCheck, perm: 'hotel.view' },
       { to: '/hotels/reviews', label: 'Guest Reviews', icon: Star, perm: 'hotel.view' },
+    ],
+  },
+  {
+    section: 'Scrap & Waste',
+    items: [
+      { to: '/scrap', label: 'Pickup Requests', icon: Recycle, perm: 'scrap.view' },
+      { to: '/scrap/buyers', label: 'Scrap Buyers', icon: Truck, perm: 'scrap.view' },
     ],
   },
   {

@@ -23,6 +23,8 @@ import Hotels from './pages/hotels/Hotels';
 import HotelRooms from './pages/hotels/HotelRooms';
 import HotelReservations from './pages/hotels/HotelReservations';
 import HotelReviews from './pages/hotels/HotelReviews';
+import ScrapRequests from './pages/scrap/ScrapRequests';
+import ScrapBuyers from './pages/scrap/ScrapBuyers';
 import Services from './pages/services/Services';
 import Offers from './pages/offers/Offers';
 import Banners from './pages/banners/Banners';
@@ -87,7 +89,11 @@ export default function App() {
 <Route path="hotels" element={<Guard perm="hotel.view"><Hotels /></Guard>} />
 <Route path="hotels/rooms" element={<Guard perm="hotel.view"><HotelRooms /></Guard>} />
 <Route path="hotels/reservations" element={<Guard perm="hotel.view"><HotelReservations /></Guard>} />
-<Route path="hotels/reviews" element={<Guard perm="hotel.view"><HotelReviews /></Guard>} />
+          <Route path="hotels/reviews" element={<Guard perm="hotel.view"><HotelReviews /></Guard>} />
+
+          <Route path="scrap" element={<Guard perm="scrap.view"><ScrapRequests /></Guard>} />
+          <Route path="scrap/buyers" element={<Guard perm="scrap.view"><ScrapBuyers /></Guard>} />
+
 
           <Route path="services" element={<Guard perm="services.view"><Services /></Guard>} />
           <Route path="offers" element={<Guard perm="offers.view"><Offers /></Guard>} />

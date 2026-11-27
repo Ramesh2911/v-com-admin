@@ -216,3 +216,15 @@ export const hotelApi = {
   reviews: (params) => api.get('/admin/hotel/reviews', { params }),
   setReviewStatus: (id, status) => api.patch(`/admin/hotel/reviews/${id}/status`, { status }),
 };
+
+export const scrapApi = {
+  stats: () => api.get('/admin/scrap/stats'),
+  requests: (params) => api.get('/admin/scrap/requests', { params }),
+  request: (id) => api.get(`/admin/scrap/requests/${id}`),
+  assign: (id, buyerId) => api.patch(`/admin/scrap/requests/${id}/assign`, { buyer_id: buyerId }),
+  setStatus: (id, data) => api.patch(`/admin/scrap/requests/${id}/status`, data),
+  buyers: (params) => api.get('/admin/scrap/buyers', { params }),
+  createBuyer: (data) => api.post('/admin/scrap/buyers', data),
+  updateBuyer: (id, data) => api.put(`/admin/scrap/buyers/${id}`, data),
+  deleteBuyer: (id) => api.delete(`/admin/scrap/buyers/${id}`),
+};

@@ -199,3 +199,20 @@ export const myNotificationsApi = {
   markRead: (ids) => api.post('/customer/notifications/read', { ids }),
   clear: () => api.delete('/customer/notifications'),
 };
+
+export const hotelApi = {
+  stats: () => api.get('/admin/hotel/stats'),
+  properties: (params) => api.get('/admin/hotel/properties', { params }),
+  createProperty: (data) => api.post('/admin/hotel/properties', data),
+  updateProperty: (id, data) => api.put(`/admin/hotel/properties/${id}`, data),
+  deleteProperty: (id) => api.delete(`/admin/hotel/properties/${id}`),
+  rooms: (params) => api.get('/admin/hotel/rooms', { params }),
+  createRoom: (data) => api.post('/admin/hotel/rooms', data),
+  updateRoom: (id, data) => api.put(`/admin/hotel/rooms/${id}`, data),
+  deleteRoom: (id) => api.delete(`/admin/hotel/rooms/${id}`),
+  reservations: (params) => api.get('/admin/hotel/reservations', { params }),
+  reservation: (id) => api.get(`/admin/hotel/reservations/${id}`),
+  setReservationStatus: (id, status) => api.patch(`/admin/hotel/reservations/${id}/status`, { status }),
+  reviews: (params) => api.get('/admin/hotel/reviews', { params }),
+  setReviewStatus: (id, status) => api.patch(`/admin/hotel/reviews/${id}/status`, { status }),
+};
